@@ -76,6 +76,11 @@ impl Search {
         }
     }
 
+    /// Gets the query that will be used for the search.
+    pub fn get_query(&self) -> &str {
+        &self.query
+    }
+
     /// Defaults to 10.
     pub fn per_page(mut self, per_page: usize) -> Self {
         self.per_page = per_page;
@@ -131,5 +136,22 @@ impl fmt::Display for Search {
             "https://api.github.com/search/{0}?per_page={1}&page={2}&q={3}",
             self.search_area, self.per_page, self.page, self.query,
         )
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn built_search() {
+        const EXPECTED: &str = "https://api.github.com/search/issues?per_page=1&page=1&q=repo:rust-lang/rust+is:pr+is:merged";
+        let search = Search::new(
+            "issues",
+            &Query::new().repo("rust-lang", "rust").is("pr").is("merged"),
+        )
+        .per_page(1);
+
+        assert_eq!(EXPECTED, search.to_string());
     }
 }
